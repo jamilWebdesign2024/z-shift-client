@@ -2,7 +2,7 @@ import React from 'react';
 import { FaShippingFast, FaMapMarkedAlt, FaWarehouse, FaMoneyBillWave, FaBuilding, FaUndo } from 'react-icons/fa';
 import ServiceCard from './ServiceCard';
 
-const services = [
+const servicesData = [
   {
     title: "Express & Standard Delivery",
     description: "We deliver parcels within 24–72 hours in Dhaka, Chittagong, Sylhet, Khulna, and Rajshahi. Express delivery available in Dhaka within 4–6 hours from pick-up to drop-off.",
@@ -37,20 +37,18 @@ const services = [
 
 const Services = () => {
   return (
-    <section className="py-10 px-4 md:px-8 lg:px-16">
+    <section className="py-10 px-4 md:px-8 lg:px-16 mt-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-2">Our Services</h2>
+        <h2 className="text-3xl font-bold mb-2 text-primary">Our Services</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
           Enjoy fast, reliable parcel delivery with real-time tracking and zero hassle. From personal packages to business shipments — we deliver on time, every time.
         </p>
       </div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {services.map((service, index) => (
+        {servicesData.map((service, index) => (
           <ServiceCard
             key={index}
-            icon={service.icon}
-            title={service.title}
-            description={service.description}
+            service={service}
           />
         ))}
       </div>
