@@ -16,27 +16,27 @@ const logos = [logo1, logo2, logo3, logo4, logo5, logo6, logo7];
 
 
 const ClientLogos = () => {
-  
 
-  return (
-    <section className='py-10 bg-gray-100'>
-        <div className='max-w-7xl mx-auto px-4'>
-            <h2 className='text-2xl font-bold text-center mb-6'>We've helped thousands of sales teams</h2>  
-        
-        <Marquee pauseOnHover speed={50} gradient={false}>
-            {logos.map((logo, idx)=>(
-                <div key={idx} className='mx-8 flex items-center'>
-                    <img src={logo} alt={`Client logo ${idx + 1}`} className='h-16 w-16 object-contain' />
-                </div>
-            ))
 
-            }
+    return (
+        <section className='py-10 bg-gray-50 max-w-6xl mx-auto rounded-2xl'>
+            <div className='max-w-7xl mx-auto px-4'>
+                <h2 className='text-2xl font-bold text-center mb-12'>We've helped thousands of sales teams</h2>
 
-        </Marquee>
-        
-        </div>
-    </section>
-  );
+                <Marquee pauseOnHover speed={50} gradient={false}>
+                    {logos.map((logo, idx) => (
+                        <div key={idx} className='mx-24 flex items-center'>
+                            <img src={logo} alt={`Client logo ${idx + 1}`} className='h-6 object-contain' />
+                        </div>
+                    ))
+
+                    }
+
+                </Marquee>
+
+            </div>
+        </section>
+    );
 };
 
 export default ClientLogos;
