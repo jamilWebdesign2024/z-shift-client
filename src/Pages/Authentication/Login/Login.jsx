@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 
 const Login = () => {
 
-    const { register, handleSubmit, formState:{} } = useForm();
+    const { register, handleSubmit, formState:{errors} } = useForm();
 
 
     const onSubmit = data => {
@@ -34,6 +34,12 @@ const Login = () => {
                              minLength: 6 })}
                         className="input"
                         placeholder="Password" />
+
+                        {
+                            errors.password.type === 'required' && <p>
+                                
+                            </p>
+                        }
 
                     <div><a className="link link-hover">Forgot password?</a></div>
 
