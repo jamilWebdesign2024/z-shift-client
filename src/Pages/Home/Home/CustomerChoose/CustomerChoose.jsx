@@ -9,7 +9,7 @@ const CustomerChoose = () => {
                 alt="Customer"
                 className="w-32 md:w-48 mx-auto mb-6 object-contain"
             />
-            <h1 className="text-2xl md:text-3xl font-bold text-primary mb-4">
+            <h1 className="text-2xl md:text-3xl font-bold text-black mb-4 ">
                 What Our Customers Are Saying
             </h1>
             <p className="text-gray-400 md:text-lg">

@@ -1,17 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&display=swap');
-
+@import url('https://unpkg.com/leaflet/dist/leaflet.css');
 
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: light --default, dark;
 }
 
-/* @plugin "daisyui/theme" {
+@plugin "daisyui/theme" {
   name: "dark";
   default: true;
-  --color-primary: blue;
+  --color-primary: #CAEB66;
+  --text-primary: black;
   --color-secondary: teal;
-} */
+}
 
 
 .font-urbanist {

@@ -15,7 +15,7 @@ const ServiceCard = ({ service }) => {
         <div className="mb-3">
           {icon}
         </div>
-        <h3 className="text-2xl font-bold text-primary">{title}</h3>
+        <h3 className="text-2xl font-bold text-black">{title}</h3>
         <p className="text-gray-600">{description}</p>
       </div>
     </div>
