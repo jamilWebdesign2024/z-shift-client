@@ -394,6 +394,9 @@ import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import 'react-toastify/dist/ReactToastify.css';
 import { useLoaderData } from 'react-router';
+import Swal from 'sweetalert2';
+import useAuth from '../../hooks/useAuth';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const ParcelForm = () => {
   // useForm for form handling
@@ -408,6 +411,9 @@ const ParcelForm = () => {
       senderName: 'John Doe', // default sender name
     },
   });
+  const {user}=useAuth();
+  const axiosSecure = useAxiosSecure();
+
 
   // Load service center data from route loader
   const serviceCenters = useLoaderData();
@@ -435,29 +441,155 @@ const ParcelForm = () => {
   };
 
   // Calculate delivery cost based on type, weight, and center
+  // const calculateCost = (data) => {
+  //   const base = data.type === 'document' ? 50 : 100;
+  //   const weightCost = data.type === 'non-document' && data.weight ? data.weight * 10 : 0;
+  //   const serviceCenterFactor = data.receiverServiceCenter === 'remote' ? 20 : 0;
+  //   return base + weightCost + serviceCenterFactor;
+  // };
+
+  const generateTrackingID = () => {
+  const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase(); // 6-char alphanumeric
+  const timestamp = dayjs().format('YYYYMMDDHHmmss');
+  return `TRK-${timestamp}-${randomPart}`;
+};
+
+  
+  
+  
+  
   const calculateCost = (data) => {
-    const base = data.type === 'document' ? 50 : 100;
-    const weightCost = data.type === 'non-document' && data.weight ? data.weight * 10 : 0;
-    const serviceCenterFactor = data.receiverServiceCenter === 'remote' ? 20 : 0;
-    return base + weightCost + serviceCenterFactor;
+    // Sender Receiver service center 
+    const senderCenter = serviceCenters.find(c => c.city === data.senderServiceCenter);
+    const receiverCenter = serviceCenters.find(c => c.city === data.receiverServiceCenter);
+
+    const senderDistrict = senderCenter?.district || '';
+    const receiverDistrict = receiverCenter?.district || '';
+
+    const isSameDistrict = senderDistrict && receiverDistrict && senderDistrict === receiverDistrict;
+
+    const weight = parseFloat(data.weight) || 0;
+
+    if (data.type === 'document') {
+      // Document pricing
+      return isSameDistrict ? 60 : 80;
+    } else {
+      // Non-document pricing
+      if (weight <= 3) {
+        return isSameDistrict ? 110 : 150;
+      } else {
+        // Extra weight price
+        const extraCharge = weight * 40;
+        return isSameDistrict ? extraCharge : extraCharge + 40;
+      }
+    }
   };
 
+
+
   // Form submission handler
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const totalCost = calculateCost(data);
     setCost(totalCost);
     setFormData(data);
 
-    // Show cost using toast
-    toast.info(`Estimated Delivery Cost: $${totalCost}`, {
-      autoClose: false,
-      closeOnClick: false,
-      closeButton: false,
-      position: 'top-center',
+    // Get delivery zones
+    const senderCenter = serviceCenters.find(c => c.city === data.senderServiceCenter);
+    const receiverCenter = serviceCenters.find(c => c.city === data.receiverServiceCenter);
+    const isSameDistrict = senderCenter?.district === receiverCenter?.district;
+    const deliveryZone = isSameDistrict ? 'Within District' : 'Outside District';
+
+    // Data extraction
+    const type = data.type === 'document' ? 'Document' : 'Non-Document';
+    const weight = parseFloat(data.weight) || 0;
+
+    // Cost details
+    let baseCost = 0;
+    let extraCharge = 0;
+    let weightCostNote = '';
+
+    if (type === 'Document') {
+      baseCost = isSameDistrict ? 60 : 80;
+    } else {
+      if (weight <= 3) {
+        baseCost = isSameDistrict ? 110 : 150;
+      } else {
+        baseCost = weight * 40;
+        if (!isSameDistrict) {
+          extraCharge = 40;
+          weightCostNote = `<li>Extra Charge (Outside District): <b>৳40</b></li>`;
+        }
+      }
+    }
+
+    // Build HTML breakdown
+    const breakdownHtml = `
+    <div style="text-align:left; font-size: 16px;">
+      <p><b>Delivery Cost Breakdown:</b></p>
+      <ul style="margin-left: 0; padding-left: 1em;">
+        <li>Parcel Type: <b>${type}</b></li>
+        <li>Weight: <b>${weight} kg</b></li>
+        <li>Delivery Zone: <b>${deliveryZone}</b></li>
+      </ul>
+      <hr style="margin: 12px 0;" />
+      <ul style="margin-left: 0; padding-left: 1em;">
+        <li>Base Cost: <b>৳${baseCost}</b></li>
+        ${weight > 3 && type === 'Non-Document'
+        ? `<li>Over 3kg Charge: <b>${weight}kg × 40 = ৳${weight * 40}</b></li>`
+        : ''
+      }
+        ${weightCostNote}
+      </ul>
+      <hr style="margin: 12px 0;" />
+      <p style="font-size: 1.2rem; font-weight: bold; color: #CAEB66">Total Cost: ৳${totalCost}</p>
+    </div>
+  `;
+
+    // SweetAlert confirm
+    const result = await Swal.fire({
+      title: 'Confirm Delivery Pricing',
+      html: breakdownHtml,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Proceed to Payment',
+      cancelButtonText: 'Edit Information',
+      reverseButtons: true,
+      customClass: {
+        popup: 'text-base',
+      },
+      allowOutsideClick: false,
+      allowEscapeKey: false,
     });
 
-    setShowConfirm(true); // show confirm button
+    if (result.isConfirmed) {
+      const parcel = {
+        ...data,
+        createdBy: user?.email || 'anonymous',
+        payment_status: 'unpaid',
+        delivery_status: 'not_collected',
+        creation_date: dayjs().toISOString(),
+        tracking_id: generateTrackingID(),
+      };
+
+      console.log('Parcel saved:', parcel);
+
+      // save
+      axiosSecure.post('/parcels', parcel)
+      .then(res=>{
+        console.log(res.data);
+        
+      })
+
+
+      toast.success('Parcel info saved!');
+      reset();
+    } else {
+      toast.info('You can edit the form now.');
+    }
   };
+
+
+
 
   // Confirm and save the parcel
   const confirmSubmission = () => {
@@ -476,7 +608,7 @@ const ParcelForm = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-2 text-black text-center">Send a Parcel</h1>
+      <h1 className="text-4xl font-bold mb-2 text-black text-center">Send a Parcel</h1>
       <p className="text-gray-600 mb-6 text-center">Please fill in the details below to send your parcel.</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
@@ -527,7 +659,7 @@ const ParcelForm = () => {
             <div key={role} className="bg-base-200 p-4 rounded-lg">
               <h2 className="text-xl font-semibold mb-4">{role === 'sender' ? 'Sender Info' : 'Receiver Info'}</h2>
               <div className="grid grid-cols-1 gap-4">
-                
+
                 {/* Name */}
                 <div className="form-control">
                   <label className="label">Name</label>

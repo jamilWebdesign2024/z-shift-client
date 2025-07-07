@@ -15,7 +15,16 @@ createRoot(document.getElementById('root')).render(
     <div className='font-urbanist max-w-7xl mx-auto'>
       <AuthProvider>
         <RouterProvider router={router} />
-        <ToastContainer />
+        <ToastContainer
+          position="top-center"
+          autoClose={3000}
+          hideProgressBar={true}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="light"
+          toastClassName="!text-lg !text-center"
+        />
       </AuthProvider>
     </div>
   </StrictMode>,
