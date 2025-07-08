@@ -11,6 +11,7 @@ import PrivateRoutes from "../routes/PrivateRoutes";
 import SendParcel from "../Pages/SendParcel/SendParcel";
 import DashboardLayout from "../Layouts/DashboardLayout";
 import MyParcels from "../Pages/Dashboard/Myparcels/MyParcels";
+// import MyParcels from "../Pages/Dashboard/Myparcels/MyParcels";
 
 export const router = createBrowserRouter([
   {

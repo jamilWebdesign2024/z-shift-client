@@ -2,15 +2,12 @@
 @import url('https://unpkg.com/leaflet/dist/leaflet.css');
 
 @import "tailwindcss";
-@plugin "daisyui" {
-  themes: light --default, dark;
-}
+@plugin "daisyui";
 
 @plugin "daisyui/theme" {
-  name: "dark";
+  name: "light";
   default: true;
-  --color-primary: #CAEB66;
-  --text-primary: black;
+  --color-primary: '#9ae600';
   --color-secondary: teal;
 }
 
