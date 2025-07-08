@@ -577,11 +577,18 @@ const ParcelForm = () => {
       axiosSecure.post('/parcels', parcel)
       .then(res=>{
         console.log(res.data);
-        
+        if(res.data.insertedId){
+          // redircted to a payment page
+            Swal.fire({
+              title: "Redirecting...",
+              text: "Proceeding to Payment gateway",
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false,
+            });
+        }
       })
-
-
-      toast.success('Parcel info saved!');
+    toast.success('Parcel info saved!');
       reset();
     } else {
       toast.info('You can edit the form now.');
