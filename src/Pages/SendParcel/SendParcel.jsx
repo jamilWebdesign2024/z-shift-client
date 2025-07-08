@@ -569,6 +569,7 @@ const ParcelForm = () => {
         delivery_status: 'not_collected',
         creation_date: dayjs().toISOString(),
         tracking_id: generateTrackingID(),
+        cost: totalCost,
       };
 
       console.log('Parcel saved:', parcel);
